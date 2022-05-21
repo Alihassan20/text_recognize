@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   learning_text_recognition:
   provider:
+  google_ml_kit: ^0.7.2
 
 dev_dependencies:
   flutter_test:
