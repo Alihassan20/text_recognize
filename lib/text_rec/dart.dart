@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:learning_input_image/learning_input_image.dart';
 import 'package:learning_text_recognition/learning_text_recognition.dart';
 import 'package:provider/provider.dart';
@@ -43,19 +46,58 @@ class _TextRecognitionPageState extends State<TextRecognitionPage> {
       overlay: Consumer<TextRecognitionState>(
         builder: (_, state, __) {
           if (state.isNotEmpty) {
-            return Container(
-              alignment: Alignment.bottomCenter,
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(4.0)),
-              ),
-              child: Text(
-                state.text,
-                style: TextStyle(
-                  wordSpacing:6 ,
-                  fontWeight: FontWeight.w400,
+            return ListView(
+              children: [
+            Container(
+                  alignment: Alignment.bottomCenter,
+                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                  decoration: const BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.all(Radius.circular(4.0)),
+                  ),
+                  child: Text(
+                    state.text,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      wordSpacing: 1,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
                 ),
-              ),
+                ElevatedButton(
+                  child: const Text(" Copy Text "),
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: state.text));
+                    showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (BuildContext ctx) {
+                          return AlertDialog(
+                              content: Container(
+                                  decoration: BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.circular(30)),
+                                  height: 150,
+                                  child: Column(
+                                    children: [
+                                      const Text("Text copied"),
+                                      const SizedBox(height: 20),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text(
+                                          "Close ",
+                                          style:
+                                              TextStyle(color: Colors.white),
+                                        ),
+                                      )
+                                    ],
+                                  )));
+                        });
+                  },
+                ),
+              ],
             );
           }
 
@@ -72,9 +114,13 @@ class TextRecognitionState extends ChangeNotifier {
   bool _isProcessing = false;
 
   InputImage? get image => _image;
+
   RecognizedText? get data => _data;
+
   String get text => _data!.text;
+
   bool get isNotProcessing => !_isProcessing;
+
   bool get isNotEmpty => _data != null && text.isNotEmpty;
 
   void startProcessing() {
